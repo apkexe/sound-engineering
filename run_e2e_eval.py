@@ -28,7 +28,7 @@ def main():
     parser.add_argument("--eval_csv", default="data/eval_pairs_mippia.csv")
     parser.add_argument("--output", default="results/mippia_e2e_results.json")
     parser.add_argument("--neg_ratio", type=int, default=1)
-    parser.add_argument("--threshold", type=float, default=0.805)
+    parser.add_argument("--threshold", type=float, default=0.829)
     parser.add_argument("--max_pairs", type=int, default=0,
                         help="Limit total pairs for quick baseline (0=all)")
     args = parser.parse_args()

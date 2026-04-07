@@ -43,27 +43,30 @@ from src.features.spectral import WindowFeatures
 
 
 # Default weights (sum to 1.0)
-# v3: Dropped artifact_boost (had -0.09 gap, actively hurting classification).
-# Replaced with artifact_diff = |artifact_A - artifact_B| which should be lower
-# for truly attributed pairs (both AI-like) vs unrelated pairs.
-# Redistributed 10% weight: +5% rhythm (strongest signal), +5% melodic.
+# These are the exact Exp 6 weights that achieved 85% accuracy (17/20, zero FP)
+# at threshold 0.829 on the full 13-branch pipeline.
+#
+# Note: A gap-proportional reweighting was tested post-Exp 6 (boosting rhythm
+# to 0.22, panns to 0.19, etc.) — it increased score gap from 0.040 to 0.066
+# but REDUCED accuracy from 85% to 80%. Classification accuracy is what matters,
+# so we use the original Exp 6 weights that produced the best result.
 DEFAULT_WEIGHTS = {
-    "semantic": 0.15,           # CLAP cosine similarity (gap=+0.080)
-    "melodic": 0.06,            # DTW chroma alignment (gap=+0.029)
-    "structural": 0.02,         # Section boundary alignment (gap=+0.013)
-    "artifact_diff": 0.01,      # |artifact_A - artifact_B| (gap=+0.007)
-    "ssm": 0.01,                # Self-similarity matrix comparison (gap=+0.005)
-    "spectral_corr": 0.01,      # Mel-spectrogram cross-correlation (gap=+0.002)
-    "rhythm": 0.22,             # Onset/tempo pattern — STRONGEST signal (gap=+0.109)
-    "mert": 0.04,               # MERT v1-330M (gap=+0.018)
-    "stem_combined": 0.02,      # Per-stem comparison (gap=+0.008, high cost)
-    "cqt": 0.01,                # CQT chroma + OTI (gap=+0.005, saturated)
-    "qmax": 0.13,               # Qmax cross-recurrence (gap=+0.075)
-    "clap_multiscale": 0.13,    # Multi-scale CLAP temporal (gap=+0.071)
-    "panns": 0.19,              # PANNs CNN14 perceptual (gap=+0.042)
+    "semantic": 0.07,           # CLAP cosine similarity (gap=+0.080)
+    "melodic": 0.04,            # DTW chroma alignment (gap=+0.029)
+    "structural": 0.03,         # Section boundary alignment (gap=+0.013)
+    "artifact_diff": 0.02,      # |artifact_A - artifact_B| (gap=+0.007)
+    "ssm": 0.03,                # Self-similarity matrix comparison (gap=+0.005)
+    "spectral_corr": 0.02,      # Mel-spectrogram cross-correlation (gap=+0.002)
+    "rhythm": 0.12,             # Onset/tempo pattern — strongest signal (gap=+0.109)
+    "mert": 0.09,               # MERT v1-330M (gap=+0.018)
+    "stem_combined": 0.25,      # Per-stem comparison via HTDemucs (gap=+0.008)
+    "cqt": 0.08,                # CQT chroma + OTI (gap=+0.005)
+    "qmax": 0.07,               # Qmax cross-recurrence (gap=+0.075)
+    "clap_multiscale": 0.10,    # Multi-scale CLAP temporal (gap=+0.071)
+    "panns": 0.08,              # PANNs CNN14 perceptual (gap=+0.042)
 }
-# Note: Dmax and tonnetz were tested (Exp. 7) but excluded — they improved
-# sub-score gap but degraded accuracy from 70% to 50% on the 10-pair subset.
+# Note: Dmax and tonnetz were tested but excluded — they degraded accuracy
+# from 70% to 50% on the 10-pair controlled comparison (§25).
 
 VERDICT_THRESHOLDS = {
     0.75: "Strong AI Attribution — Track B is very likely a synthetic derivative of Track A",

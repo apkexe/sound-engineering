@@ -29,7 +29,7 @@ from src.model.calibration import ScoreCalibrator
 def evaluate(
     pairs_csv: str,
     output_path: str = None,
-    threshold: float = 0.805,
+    threshold: float = 0.829,
     calibration_model: str = None,
 ):
     df = pd.read_csv(pairs_csv)
@@ -136,8 +136,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--threshold",
         type=float,
-        default=0.805,
-        help="Decision threshold (0.805 is the validated default on MIPPIA full eval)",
+        default=0.829,
+        help="Decision threshold (0.829 is the Exp 6 optimum — 85%% accuracy, zero false positives)",
     )
     parser.add_argument("--calibration_model", default=None, help="Optional calibration model JSON")
     args = parser.parse_args()

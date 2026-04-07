@@ -305,7 +305,7 @@ def main():
     parser.add_argument("--results_json", default=None, help="Single JSON for nested CV analysis")
     parser.add_argument("--train_json", default=None, help="Train JSON for explicit train/test gap audit")
     parser.add_argument("--test_json", default=None, help="Test JSON for explicit train/test gap audit")
-    parser.add_argument("--baseline_threshold", type=float, default=0.805, help="Baseline fixed threshold")
+    parser.add_argument("--baseline_threshold", type=float, default=0.829, help="Baseline fixed threshold (Exp 6 optimum)")
     parser.add_argument("--output", default="experiments/results/robust_validation_report.json")
     parser.add_argument("--n_holdout_runs", type=int, default=200, help="Repeated holdout runs for stability audit")
     args = parser.parse_args()

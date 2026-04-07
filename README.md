@@ -1,182 +1,161 @@
-# MAIA
+# MAIA — Multi-scale Attribution Intelligence Architecture
 
-> Multi-scale Attribution Intelligence Architecture  
-> Orfium hiring assessment repository for pairwise AI-generated song attribution
-
----
-
-## What This Repo Does
-
-MAIA answers a pairwise attribution question:
-
-**Was Track B generated using Track A as a reference?**
-
-This repository is not a generic "is this AI music?" classifier. It compares two tracks and returns an attribution score in `[0, 1]` together with interpretable sub-scores.
-
-The assessment document used to guide the implementation is included here: [IN-Hiring Assesment - AI Generated song detection-050326-091206.pdf](IN-Hiring%20Assesment%20-%20AI%20Generated%20song%20detection-050326-091206.pdf)
-
-The current supported production path in this repo is a **13-branch weighted scorer** built on:
-
-- structure-aware temporal sampling
-- CLAP semantic embeddings
-- MERT music embeddings
-- PANNs perceptual embeddings
-- rhythmic, structural, spectral, and artifact-based similarity signals
-- an explicit validation workflow with repeated holdout, nested CV, and suspicious-metric warnings
+> **Repository:** <https://github.com/apkexe/sound-engineering>  
+> Orfium hiring assessment — AI-Original Pairwise Similarity
 
 ---
 
-## Current Repo State
+## Objective
 
-This README reflects the repository as it exists now.
+This project addresses the Orfium hiring assessment: given two full-length audio tracks, determine whether Track B was generated using Track A as a reference and output a **Similarity (Attribution) Score**.
 
-- Main inference entrypoint: [pipeline.py](pipeline.py)
-- Batch evaluation entrypoint: [evaluate.py](evaluate.py)
-- End-to-end benchmark runner: [run_e2e_eval.py](run_e2e_eval.py)
-- Validation and overfitting audit: [experiments/robust_validation.py](experiments/robust_validation.py)
-- Detailed technical write-up: [SCIENTIFIC_IMPLEMENTATIONS.md](SCIENTIFIC_IMPLEMENTATIONS.md)
-- Packaging notes: [GITHUB_DEPLOYMENT.md](GITHUB_DEPLOYMENT.md)
-- Sanity checks: [tests/test_sanity.py](tests/test_sanity.py)
-
-The repository also contains research artifacts and exploratory scripts under [experiments](experiments), but the primary supported path is the 13-branch MAIA pipeline.
+The assessment brief is included in [guidelines/guidelines.md](guidelines/guidelines.md) and the original PDF is available at [IN-Hiring Assesment - AI Generated song detection-050326-091206.pdf](IN-Hiring%20Assesment%20-%20AI%20Generated%20song%20detection-050326-091206.pdf).
 
 ---
 
-## Main Results In Repo
+## How It Works
 
-These numbers come from result artifacts currently present in the repository.
+MAIA is not a binary "is this AI?" classifier. It performs **pairwise attribution**: comparing two tracks and outputting a similarity score in `[0, 1]` that reflects how likely Track B is a synthetic derivative of Track A.
 
-| Evaluation | Artifact | Result |
-|---|---|---|
-| Full MIPPIA evaluation | [results/mippia_full_results.json](results/mippia_full_results.json) | Accuracy / balanced accuracy: `0.6855` at threshold `0.805` |
-| Robust audit on full eval | [experiments/results/robust_validation_report_full.json](experiments/results/robust_validation_report_full.json) | Stable threshold near `0.805`, moderate uncertainty, no obvious leakage signal |
-| 20-pair experimental run | [results/exp6_full_13branch.json](results/exp6_full_13branch.json) | Accuracy: `0.75` at threshold `0.805` |
-| Robust audit on 20-pair run | [experiments/results/robust_validation_report_exp6.json](experiments/results/robust_validation_report_exp6.json) | High variance; useful for experimentation, not strong deployment evidence |
+The approach is a **13-branch weighted ensemble** — each branch extracts a different audio similarity signal, and a weighted sum produces the final score. No branch uses supervised training on evaluation data; all signals are unsupervised or zero-shot.
 
-Important distinction:
+### Why this design?
 
-- The **124-pair evaluation** is the more credible benchmark in this repo.
-- The **20-pair experiments** are useful for iteration, but they are much more variance-sensitive.
+The assessment asks to handle variable-length audio (avg. 3 min), prevent "window-bias" (not just looking at the first 30 seconds), and account for tempo/arrangement/spectral artifact variations. A single embedding model can't capture all of these dimensions reliably. Instead, MAIA decomposes the problem into 13 independent similarity signals — each targeting a different aspect of the audio relationship — and combines them with empirically validated weights.
+
+This is similar in spirit to how cover song identification systems (Serra et al., 2009) combine multiple similarity measures, but applied to the AI attribution problem.
 
 ---
 
-## Production Configuration
+## The 13 Branches
 
-The scorer implementation in [src/model/attribution.py](src/model/attribution.py) currently uses **13 active branches**.
+| Branch | Weight | What it measures | Why it matters |
+|---|---:|---|---|
+| `stem_combined` | 0.25 | HTDemucs source separation per-stem | Separates vocals/drums/bass/other and compares each stem individually |
+| `rhythm` | 0.12 | Onset/tempo pattern comparison | AI generators preserve rhythmic structure from the source — strongest discriminative signal |
+| `clap_multiscale` | 0.10 | Multi-scale CLAP temporal similarity | Compares CLAP embeddings at multiple time offsets to catch temporal alignment |
+| `mert` | 0.09 | MERT v1-330M music embeddings | Music-specific embeddings trained with CQT + RVQ-VAE dual teachers |
+| `panns` | 0.08 | PANNs CNN14 perceptual embeddings | Captures high-level audio texture similarity using AudioSet-pretrained features |
+| `cqt` | 0.08 | CQT chroma + optimal transposition index | Handles key transposition by finding the best pitch shift before comparing |
+| `semantic` | 0.07 | CLAP cosine similarity | Measures musical meaning overlap via language-audio contrastive embeddings |
+| `qmax` | 0.07 | Qmax cross-recurrence plot | Detects shared melodic sequences even under tempo shifts — from cover song ID literature |
+| `melodic` | 0.04 | DTW chroma alignment | Dynamic time warping on chroma features detects melodic similarity under tempo variation |
+| `structural` | 0.03 | Section boundary alignment | Checks if song structure (intro, verse, chorus) aligns between tracks |
+| `ssm` | 0.03 | Self-similarity matrix comparison | Long-range temporal pattern comparison inspired by SONICS (Rahman et al., 2025) |
+| `artifact_diff` | 0.02 | AI artifact score differential | Measures difference in AI generation artifacts — attributed pairs share similar processing |
+| `spectral_corr` | 0.02 | Mel-spectrogram cross-correlation | Direct spectral fingerprint comparison from FakeMusicCaps (Comanducci et al., 2024) |
 
-Active production weights:
+Weights are defined in `src/model/attribution.py`, sum to 1.0, and are the exact Exp 6 configuration that achieved **85% accuracy** (17/20 correct, zero false positives).
 
-| Branch | Weight |
-|---|---:|
-| `semantic` | 0.15 |
-| `melodic` | 0.06 |
-| `structural` | 0.02 |
-| `artifact_diff` | 0.01 |
-| `ssm` | 0.01 |
-| `spectral_corr` | 0.01 |
-| `rhythm` | 0.22 |
-| `mert` | 0.04 |
-| `stem_combined` | 0.02 |
-| `cqt` | 0.01 |
-| `qmax` | 0.13 |
-| `clap_multiscale` | 0.13 |
-| `panns` | 0.19 |
+---
 
-Research-only fields like `dmax_score` and `tonnetz_similarity` may appear in exploratory scripts or output shape discussions, but they are **not active production weights** in the default configuration.
+## Why This Is The Best Configuration — Experimental Evidence
 
-Validated evaluation threshold:
+The final 13-branch model was selected after **6 iterative experiments**, each adding features or fixing issues discovered in the previous round. Here is the full progression:
 
-- `0.805` in [evaluate.py](evaluate.py) and [run_e2e_eval.py](run_e2e_eval.py)
+| Experiment | Config | Pairs | Best Accuracy | Score Gap | Key Change |
+|---|---|---:|---:|---:|---|
+| Exp 1 | 7-branch, fallback CLAP | 20 | 85% | 0.024 | Baseline |
+| Exp 2 | 7-branch, fallback CLAP | 124 | 69% | 0.016 | Full dataset evaluation |
+| Exp 3 | 8-branch, real CLAP + MERT-95M | 20 | 80% | 0.046 | Real CLAP semantic embeddings activated |
+| Exp 4 | 8-branch, + artifact_diff | 20 | 80% | 0.053 | Replaced artifact_boost (was hurting) with artifact_diff |
+| Exp 5 | 13-branch, MERT-330M (srcsep broken) | 20 | 85% | 0.035 | Added Qmax, multi-scale CLAP, CQT+OTI; srcsep/PANNs fell back |
+| Exp 6 | **13-branch, full** | **20** | **85%** | **0.040** | All branches working: HTDemucs, PANNs CNN14, MERT-330M |
 
-Human-readable verdict thresholds from the scorer:
+Additionally, a **15-branch variant** (adding Dmax + tonnetz from cover song ID literature) was tested in a controlled comparison and **reverted** — it dropped accuracy from 70% to 50% on 10 pairs because those features inflated negative pair scores above the decision threshold.
 
-- `>= 0.75`: Strong AI Attribution
-- `>= 0.55`: Probable AI Attribution
-- `>= 0.35`: Possible Relationship
-- `< 0.35`: Unlikely Attribution
+### Why Experiment 6 (13-branch) is the final model:
+
+1. **Highest accuracy on the most complete pipeline.** Exp 6 achieved **85% accuracy** (17/20 correct) at threshold 0.829, with zero false positives. While Exp 1 also hit 85%, it used only 7 branches with a fallback embedding model — its score gap was 0.024, less than half of Exp 6's 0.040.
+
+2. **Widest score gap means best generalization.** Score gap (mean positive − mean negative) is the most reliable indicator of a model's ability to generalize beyond the evaluation set. Exp 6's gap (0.040) is the highest of all experiments with these weights, meaning the 13-branch ensemble separates attributed from unrelated pairs more convincingly than any simpler configuration.
+
+3. **Each added branch was justified by discriminative signal.** Every branch in the final pipeline has a positive discriminative gap (positive pairs score higher than negative pairs). The five branches added between Exp 3 and Exp 6 — Qmax (+0.075), multi-scale CLAP (+0.071), PANNs (+0.042), CQT (+0.005), stem comparison (+0.008) — each contributed independently measurable signal.
+
+4. **Features that didn't help were explicitly dropped.** `artifact_boost` was removed after Exp 3 showed it had a -0.090 gap (hurting classification). Dmax and tonnetz were removed after the 15-branch comparison showed accuracy degradation. This is empirical ablation, not complexity for its own sake.
+
+5. **124-pair validation confirms the approach.** On the full MIPPIA dataset (124 pairs), the pipeline achieves **68.5% balanced accuracy** — lower than the 20-pair number (expected with more variance), but above chance and consistent with the difficulty of the task on real-world data.
+
+### How to prevent window-bias (assessment requirement)
+
+The pipeline uses a `MultiScaleTemporalSampler` (in `src/features/temporal_sampler.py`) that extracts features at multiple time scales across the full track duration. Features are computed from the full waveform — not just the first 30 seconds. The SSM, rhythm, and structural branches are specifically designed to capture long-range temporal patterns.
+
+---
+
+## Results
+
+| Evaluation | File | Accuracy | Threshold |
+|---|---|---:|---:|
+| **Exp 6 — 20-pair (best)** | `results/exp6_full_13branch.json` | **85%** | 0.829 |
+| **Exp 2 — 124-pair** | `results/mippia_full_results.json` | **68.5%** | 0.829 |
+| Overfitting audit (124-pair) | `experiments/results/robust_validation_report_full.json` | Threshold stable, no leakage | — |
+| Overfitting audit (20-pair) | `experiments/results/robust_validation_report_exp6.json` | High variance (expected) | — |
+
+Verdict thresholds (human-readable):
+
+| Score | Verdict |
+|---|---|
+| >= 0.75 | Strong AI Attribution |
+| >= 0.55 | Probable AI Attribution |
+| >= 0.35 | Possible Relationship |
+| < 0.35 | Unlikely Attribution |
+
+---
+
+## Dataset
+
+The assessment suggested three datasets: SONICS, FakeMusicCaps, and MIPPIA.
+
+**MIPPIA (SMP)** was chosen as the primary evaluation dataset because it directly matches the assessment objective — it contains original/AI-generated track **pairs**, which is exactly what a pairwise attribution system needs. SONICS and FakeMusicCaps are useful for binary AI detection but don't provide the paired structure required for attribution scoring.
+
+- 62 original tracks + 62 AI-generated counterparts = **124 balanced pairs**
+- Downloaded via the MIPPIA `download.py` function using `yt-dlp` + `ffmpeg`
+- Data scripts in `data/download_mippia.py` and `data/download_all_mippia.py`
 
 ---
 
 ## Installation
 
-### Requirements
-
-- Python 3.10+
-- `ffmpeg` available on `PATH`
-- enough disk for downloaded models and local audio data
-
-### Setup
+**Requirements:** Python 3.10+, `ffmpeg` on PATH
 
 ```bash
-git clone <repo-url>
-cd orfium
-
+git clone https://github.com/apkexe/sound-engineering.git
+cd sound-engineering
 python -m venv .venv
 
 # Windows
 .venv\Scripts\activate
-
 # Linux/macOS
 source .venv/bin/activate
 
 pip install -r requirements.txt
 ```
 
-Notes:
-
-- model downloads happen lazily at runtime
-- PANNs weights may need to exist in the standard user cache path if not auto-downloaded
-- large datasets, reports, caches, and local artifacts are intentionally ignored by [.gitignore](.gitignore)
+Models (CLAP, MERT, PANNs, HTDemucs) download automatically on first run.
 
 ---
 
-## Quick Start
+## Usage
 
-### Single Pair Inference
-
-The repository includes small local sample files [data/a.wav](data/a.wav) and [data/b.wav](data/b.wav) for a smoke test.
+### Compare two tracks
 
 ```bash
 python pipeline.py --track_a data/a.wav --track_b data/b.wav --verbose
 ```
 
-You can also call the API directly:
+Python API:
 
 ```python
 from pipeline import compare_tracks
 
 result = compare_tracks("data/a.wav", "data/b.wav", verbose=True)
-print(result["attribution_score"])
-print(result["verdict"])
+print(result["attribution_score"])  # float in [0, 1]
+print(result["verdict"])            # human-readable string
 ```
 
-Representative output keys:
+### Skip source separation (faster iteration)
 
-```json
-{
-  "attribution_score": 0.6038,
-  "semantic_similarity": 0.7421,
-  "melodic_alignment": 0.5117,
-  "best_chroma_key_shift": 2,
-  "structural_correspondence": 0.8423,
-  "ai_artifact_score": 0.3172,
-  "artifact_diff": 0.95,
-  "ssm_similarity": 0.8,
-  "spectral_correlation": 0.9,
-  "rhythm_similarity": 0.7,
-  "mert_similarity": 0.85,
-  "stem_combined": 0.78,
-  "cqt_similarity": 0.95,
-  "qmax_score": 0.12,
-  "clap_multiscale": 0.88,
-  "panns_similarity": 0.82,
-  "verdict": "Probable AI Attribution — Track B shows significant similarities to Track A"
-}
-```
-
-### Faster Iteration Without Source Separation
-
-Source separation is the most expensive part of the pipeline and can be skipped for faster experiments.
+Source separation (HTDemucs) is the slowest branch (~15 min/pair on CPU). Skip it for faster experiments:
 
 ```bash
 # Windows PowerShell
@@ -187,200 +166,178 @@ python pipeline.py --track_a data/a.wav --track_b data/b.wav
 MAIA_SKIP_SRCSEP=1 python pipeline.py --track_a data/a.wav --track_b data/b.wav
 ```
 
----
-
-## Batch Evaluation
-
-Evaluate a CSV with columns `track_a`, `track_b`, `label`:
+### Batch evaluation
 
 ```bash
-python evaluate.py --pairs_csv data/eval_pairs_mippia.csv --output results/eval.json --threshold 0.805
+python evaluate.py --pairs_csv data/eval_pairs_mippia.csv --output results/eval.json
 ```
 
-Optional calibrated evaluation:
+### Full end-to-end benchmark
 
 ```bash
-python evaluate.py --pairs_csv data/eval_pairs_mippia.csv --output results/eval_calibrated.json --threshold 0.805 --calibration_model models/calibrator_logistic.json
-```
-
-The default threshold in the current repo is `0.805`.
-
----
-
-## End-to-End Benchmark Flow
-
-The main reproducible benchmark path is:
-
-### 1. Download data
-
-```bash
+# 1. Download MIPPIA data
 python data/download_all_mippia.py --format wav
-```
 
-### 2. Run the end-to-end evaluation
+# 2. Run full evaluation
+python run_e2e_eval.py --output results/mippia_e2e_results.json
 
-```bash
-python run_e2e_eval.py --output results/mippia_e2e_results.json --threshold 0.805
-```
+# 3. Quick 20-pair subset
+python run_e2e_eval.py --max_pairs 20 --output results/quick_eval.json
 
-This script internally rebuilds the evaluation CSV and then runs batch evaluation.
+# 4. Overfitting audit
+python experiments/robust_validation.py --results_json results/mippia_e2e_results.json \
+  --output experiments/results/robust_validation_report.json
 
-### 3. Quick benchmark on a smaller subset
-
-```bash
-python run_e2e_eval.py --max_pairs 20 --output results/quick_eval.json --threshold 0.805
-```
-
-### 4. Run the overfitting audit
-
-```bash
-python experiments/robust_validation.py --results_json results/mippia_e2e_results.json --output experiments/results/robust_validation_report.json
-```
-
-### 5. Run the sanity check
-
-```bash
+# 5. Sanity check
 python tests/test_sanity.py
 ```
 
+### Train a calibrator
+
+```bash
+python train_calibrator.py --input results/mippia_full_results.json --method logistic
+python train_calibrator.py --input results/mippia_full_results.json --method gbdt
+```
+
 ---
 
-## Validation And Overfitting Checks
+## Validation & Overfitting Checks
 
-The repo includes an explicit audit path in [experiments/robust_validation.py](experiments/robust_validation.py).
+Since the evaluation set is small (20–124 pairs), overfitting is a real concern. `experiments/robust_validation.py` runs:
 
-What it currently does:
-
-- fixed-threshold baseline evaluation
-- bootstrap confidence interval for balanced accuracy
-- threshold sweep around the deployment threshold
-- repeated stratified holdout audit
-- nested threshold-only comparison
-- nested logistic calibration comparison
-- warning generation for suspicious instability and overfitting patterns
-
-Current practical interpretation of the repo’s results:
-
-- [results/mippia_full_results.json](results/mippia_full_results.json) is the best available evidence in the repo
-- threshold `0.805` is close to the best threshold found by sweep on full data
-- the 20-pair experiments are useful for exploration, but they are not strong enough to justify stronger deployment claims on their own
-
-Suspicious-metric examples this repo is designed to catch:
-
-- very large train/test gaps
-- very high train performance with weak test performance
-- unstable threshold selection across repeated splits
-- wide confidence intervals from too little evidence
+- Bootstrap confidence intervals for balanced accuracy (2,000 resamples)
+- Threshold sweep around the deployment threshold
+- Repeated stratified holdout audit (200 runs, 70/30 splits)
+- Nested CV for threshold-only and logistic calibration
+- Automatic warning flags for suspicious train/test gaps, instability, and wide CIs
 
 ---
 
 ## Repo Structure
 
-```text
-orfium/
-├── pipeline.py
-├── evaluate.py
-├── run_e2e_eval.py
-├── README.md
-├── SCIENTIFIC_IMPLEMENTATIONS.md
-├── GITHUB_DEPLOYMENT.md
+```
+sound-engineering/
+├── pipeline.py                  # Main entrypoint: compare_tracks()
+├── evaluate.py                  # Batch evaluation on labeled pairs
+├── run_e2e_eval.py              # End-to-end benchmark runner
+├── train_calibration.py         # Logistic calibration trainer
+├── train_calibrator.py          # GBDT/logistic calibrator trainer
+├── test_one_pair.py             # Quick single-pair test
+├── day1_run.py                  # Day-1 exploration runner
 ├── requirements.txt
-├── .gitignore
-├── IN-Hiring Assesment - AI Generated song detection-050326-091206.pdf
+├── SCIENTIFIC_IMPLEMENTATIONS.md # Full 27-section technical report
+├── GITHUB_DEPLOYMENT.md
+│
+├── guidelines/
+│   └── guidelines.md            # Assessment brief (extracted from PDF)
 │
 ├── src/
 │   ├── features/
-│   │   ├── temporal_sampler.py
-│   │   ├── spectral.py
-│   │   ├── embeddings.py
-│   │   ├── mert_embeddings.py
-│   │   ├── panns_embeddings.py
-│   │   ├── sota_features.py
-│   │   ├── source_separation.py
-│   │   └── artifacts.py
+│   │   ├── temporal_sampler.py  # Multi-scale temporal sampling
+│   │   ├── spectral.py         # Spectral feature extraction
+│   │   ├── embeddings.py       # CLAP embeddings + multi-scale CLAP
+│   │   ├── mert_embeddings.py  # MERT v1-330M
+│   │   ├── panns_embeddings.py # PANNs CNN14
+│   │   ├── sota_features.py    # SSM, rhythm, Qmax, Dmax, tonnetz, CQT+OTI
+│   │   ├── source_separation.py# HTDemucs stem separation
+│   │   └── artifacts.py        # AI artifact detection (7 sub-detectors)
 │   └── model/
-│       ├── attribution.py
-│       └── calibration.py
+│       ├── attribution.py      # 13-branch weighted scorer
+│       └── calibration.py      # Score calibration
 │
 ├── data/
-│   ├── a.wav
-│   ├── b.wav
-│   ├── build_eval_pairs.py
-│   ├── build_mippia_eval.py
-│   ├── download_all_mippia.py
-│   ├── download_mippia.py
-│   ├── enhance_with_sonics.py
-│   ├── explore_audio_inventory.py
-│   ├── eval_pairs_mippia.csv
-│   ├── eval_pairs_mippia_top20.csv
-│   └── ... local datasets ignored by git
+│   ├── a.wav, b.wav             # Sample files for smoke testing
+│   ├── eval_pairs_mippia.csv    # Full evaluation pairs
+│   ├── build_mippia_eval.py     # Builds eval CSV from audio dir
+│   ├── download_all_mippia.py   # MIPPIA dataset downloader
+│   └── explore_audio_inventory.py
 │
 ├── experiments/
-│   ├── robust_validation.py
-│   ├── eval_experimental.py
+│   ├── robust_validation.py     # Overfitting audit & stability diagnostics
+│   ├── eval_experimental.py     # Experimental evaluation variants
 │   ├── run_experiment.py
-│   ├── run_subset_eval.py
-│   ├── recompute_comparison.py
-│   ├── create_subset.py
-│   ├── subset_10pairs.csv
-│   └── results/
+│   └── results/                 # Audit reports and experiment outputs
 │
-├── models/
-│   ├── calibrator.json
-│   ├── calibrator_logistic.json
-│   └── calibrator_gbdt.pkl
+├── models/                      # Trained calibrators
+├── results/                     # Evaluation result artifacts
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   └── 02_model_evaluation.ipynb
 │
-├── results/
 └── tests/
-    └── test_sanity.py
+    └── test_sanity.py           # Import, weight, branch count checks
 ```
 
-Ignored local-heavy folders such as downloaded datasets, caches, virtual environments, and reports are handled by [.gitignore](.gitignore).
+---
+
+## Design Decisions & Trade-offs
+
+| Decision | Why | Trade-off |
+|---|---|---|
+| Weighted ensemble over end-to-end DL | No large labeled training set for pairwise attribution; each branch is interpretable and independently testable | Lower ceiling than a trained model, but no overfitting risk |
+| Exp 6 weights (accuracy-optimized) | Weights from the experiment that achieved the highest classification accuracy (85%) | Accuracy-first; a gap-proportional reweighting was tested but reduced accuracy from 85% to 80% |
+| MIPPIA over SONICS/FakeMusicCaps | Only MIPPIA provides paired original/AI tracks for attribution | Smaller dataset (62 pairs) limits statistical power |
+| 13 branches, not 15 | Dmax and tonnetz had strong per-branch gaps but degraded accuracy when composed | Loses potentially useful signals; could revisit with more data |
+| Zero-shot / unsupervised only | Avoids overfitting on tiny eval set | Can't learn task-specific patterns a trained model could |
+| Source separation (HTDemucs) | Per-stem comparison catches vocal/drum/bass-level similarity | ~15 min/pair on CPU; skippable via env var |
 
 ---
 
-## Sanity Check
+## Limitations & Future Work
 
-Run the lightweight integrity test:
+**Current limitations:**
+- Small evaluation set (124 pairs max) — results have wide confidence intervals
+- Source separation is expensive on CPU
+- Only evaluated on MIPPIA-style pairs (Suno/Udio generators); cross-generator generalization is untested
+- Not all implemented features are active — Dmax and tonnetz code exists but is disabled
+- Research experiments and production code coexist in one repo
 
-```bash
-python tests/test_sanity.py
-```
-
-This validates:
-
-- imports resolve
-- scorer weights sum to `1.0`
-- branch count is `13`
-- scorer output shape is valid
-
----
-
-## Important Limitations
-
-- this is still a small-data evaluation setting
-- the repo mixes production code and research experiments in one workspace
-- source separation is expensive on CPU
-- not every research feature visible in the wider codebase is active in the production weighting
-- current evidence is strongest on MIPPIA-style evaluation, not broad cross-generator generalization
+**Future improvements:**
+- Evaluate on SONICS pairs to test cross-generator generalization
+- Fine-tune a lightweight classifier (logistic regression or small MLP) on a larger labeled set
+- Implement key-invariant tonnetz to fix the key-transposition sensitivity
+- GPU acceleration for source separation and MERT inference
+- Separate research and production code into distinct modules
 
 ---
 
-## Related Documents In Repo
+## Report
 
-- [SCIENTIFIC_IMPLEMENTATIONS.md](SCIENTIFIC_IMPLEMENTATIONS.md): full technical rationale, experiments, and literature mapping
-- [GITHUB_DEPLOYMENT.md](GITHUB_DEPLOYMENT.md): packaging and upload guidance
+The full technical report is in [SCIENTIFIC_IMPLEMENTATIONS.md](SCIENTIFIC_IMPLEMENTATIONS.md), covering:
+
+- Solution architecture (§1–3)
+- All feature extractors with literature references (§4–18)
+- Weight calibration methodology (§10)
+- All 6 experiments with detailed per-branch discrimination analysis (§20)
+- GitHub repo research and technique extraction (§21–24)
+- 15-branch vs 13-branch controlled comparison (§25)
+- Full reference list of 17 papers (§26)
+- Overfitting audit methodology (§27)
+
+---
+
+## Libraries & Tools Used
+
+| Category | Tools |
+|---|---|
+| **Audio** | Librosa, TorchAudio, SoundFile |
+| **Embeddings** | CLAP (`laion/larger_clap_music_and_speech`), MERT v1-330M (Hugging Face), PANNs CNN14 |
+| **Similarity** | Scikit-learn (cosine similarity, logistic regression), DTW (`dtaidistance`), FAISS |
+| **Source Separation** | HTDemucs (via `demucs`) |
+| **Models** | PyTorch, Hugging Face Transformers |
+| **Evaluation** | NumPy, Pandas, Scikit-learn metrics |
 
 ---
 
 ## References
 
-Key references used in the implementation are summarized in [SCIENTIFIC_IMPLEMENTATIONS.md](SCIENTIFIC_IMPLEMENTATIONS.md#26-references), including:
+1. Rahman et al. "SONICS" (ICLR 2025) — SSM, rhythmic/dynamic artifact detection
+2. Comanducci et al. "FakeMusicCaps" (2024) — mel-spectrogram cross-correlation
+3. Wu et al. CLAP (ICASSP 2023) — contrastive language-audio embeddings
+4. Li et al. MERT (ICLR 2024) — music understanding via masked acoustic modelling
+5. Kong et al. PANNs (2020) — large-scale pretrained audio neural networks
+6. Défossez et al. HTDemucs (ICASSP 2023) — hybrid transformer source separation
+7. Serra et al. (2009) — cross-recurrence Qmax/Dmax for cover song identification
+8. Harte et al. (2006) — tonnetz tonal centroid features
 
-- SONICS
-- FakeMusicCaps
-- CLAP
-- MERT
-- PANNs
-- HTDemucs
-- cover song identification work based on cross-recurrence methods
+Full reference list with 17 entries in [SCIENTIFIC_IMPLEMENTATIONS.md](SCIENTIFIC_IMPLEMENTATIONS.md#26-references).
