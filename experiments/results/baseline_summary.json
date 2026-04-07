@@ -1,0 +1,12 @@
+{
+  "experiment": "baseline",
+  "accuracy": 0.7,
+  "precision": 0.999999995,
+  "recall": 0.3999999992,
+  "f1": 0.5714285657142857,
+  "threshold": 0.72,
+  "elapsed_seconds": 3717.8,
+  "mean_score_pos": 0.6974,
+  "mean_score_neg": 0.6814,
+  "score_gap": 0.016
+}

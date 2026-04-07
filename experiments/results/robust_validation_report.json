@@ -1,0 +1,44 @@
+{
+  "single_file_analysis": {
+    "input": "results/mippia_full_results.json",
+    "n_pairs": 124,
+    "n_pos": 62,
+    "n_neg": 62,
+    "baseline": {
+      "accuracy": 0.6854838709677419,
+      "balanced_accuracy": 0.685483870967742,
+      "f1": 0.688,
+      "precision": 0.6825396825396826,
+      "recall": 0.6935483870967742,
+      "tp": 43,
+      "fp": 20,
+      "fn": 19,
+      "tn": 42,
+      "model": "fixed_threshold_0.805"
+    },
+    "nested_threshold_only": {
+      "accuracy": 0.6774193548387096,
+      "balanced_accuracy": 0.6774193548387097,
+      "f1": 0.6666666666666666,
+      "precision": 0.6896551724137931,
+      "recall": 0.6451612903225806,
+      "tp": 40,
+      "fp": 18,
+      "fn": 22,
+      "tn": 44,
+      "model": "nested_cv_threshold_only"
+    },
+    "nested_logistic": {
+      "accuracy": 0.6612903225806451,
+      "balanced_accuracy": 0.6612903225806451,
+      "f1": 0.6557377049180327,
+      "precision": 0.6666666666666666,
+      "recall": 0.6451612903225806,
+      "tp": 40,
+      "fp": 20,
+      "fn": 22,
+      "tn": 42,
+      "model": "nested_cv_logistic"
+    }
+  }
+}

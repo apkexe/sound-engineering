@@ -1,0 +1,78 @@
+{
+  "single_file_analysis": {
+    "input": "results/exp6_full_13branch.json",
+    "n_pairs": 20,
+    "n_pos": 10,
+    "n_neg": 10,
+    "baseline": {
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.75,
+      "f1": 0.782608695652174,
+      "precision": 0.6923076923076923,
+      "recall": 0.9,
+      "tp": 9,
+      "fp": 4,
+      "fn": 1,
+      "tn": 6,
+      "model": "fixed_threshold_0.805"
+    },
+    "baseline_balanced_accuracy_ci95_bootstrap": {
+      "metric": "balanced_accuracy",
+      "mean": 0.7526508701674143,
+      "ci95_low": 0.5594093406593407,
+      "ci95_high": 0.9375,
+      "ci95_width": 0.37809065934065933
+    },
+    "threshold_sweep": {
+      "best_threshold": 0.8280000000000001,
+      "best_balanced_accuracy": 0.85,
+      "best_accuracy": 0.85,
+      "best_f1": 0.8235294117647058
+    },
+    "repeated_holdout_threshold_audit": {
+      "n_runs": 200,
+      "test_size": 0.3,
+      "train_balanced_accuracy_mean": 0.8567857142857146,
+      "train_balanced_accuracy_std": 0.048828707148360295,
+      "test_balanced_accuracy_mean": 0.7266666666666667,
+      "test_balanced_accuracy_std": 0.14760322264249526,
+      "train_test_balanced_accuracy_gap_mean": 0.1301190476190477,
+      "train_f1_mean": 0.8468227850580792,
+      "test_f1_mean": 0.7122142857142856,
+      "train_test_f1_gap_mean": 0.13460849934379346,
+      "tuned_threshold_mean": 0.81627,
+      "tuned_threshold_std": 0.01478818963780961,
+      "tuned_threshold_p10": 0.785,
+      "tuned_threshold_p90": 0.8280000000000001
+    },
+    "nested_threshold_only": {
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.75,
+      "f1": 0.7619047619047619,
+      "precision": 0.7272727272727273,
+      "recall": 0.8,
+      "tp": 8,
+      "fp": 3,
+      "fn": 2,
+      "tn": 7,
+      "model": "nested_cv_threshold_only"
+    },
+    "nested_logistic": {
+      "accuracy": 0.65,
+      "balanced_accuracy": 0.65,
+      "f1": 0.6956521739130435,
+      "precision": 0.6153846153846154,
+      "recall": 0.8,
+      "tp": 8,
+      "fp": 5,
+      "fn": 2,
+      "tn": 5,
+      "model": "nested_cv_logistic"
+    },
+    "warnings": [
+      "Potential overfitting: repeated train-test balanced-accuracy gap >= 0.08.",
+      "Potential instability: test balanced-accuracy variance is high across random splits.",
+      "High uncertainty: baseline metric confidence interval is wide; more data is recommended."
+    ]
+  }
+}

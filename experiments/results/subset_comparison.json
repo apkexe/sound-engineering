@@ -1,0 +1,141 @@
+{
+  "baseline_13branch": {
+    "experiment": "baseline_13branch",
+    "accuracy": 0.7,
+    "precision": 1.0,
+    "recall": 0.4,
+    "f1": 0.5714,
+    "threshold": 0.72,
+    "mean_score_pos": 0.7063,
+    "mean_score_neg": 0.6911,
+    "score_gap": 0.0152,
+    "confusion": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 3,
+      "tn": 5
+    }
+  },
+  "improved_15branch": {
+    "experiment": "improved_15branch",
+    "accuracy": 0.5,
+    "precision": 0.5,
+    "recall": 0.4,
+    "f1": 0.4444,
+    "threshold": 0.72,
+    "mean_score_pos": 0.7073,
+    "mean_score_neg": 0.6882,
+    "score_gap": 0.0191,
+    "confusion": {
+      "tp": 2,
+      "fp": 2,
+      "fn": 3,
+      "tn": 3
+    }
+  },
+  "improvement_gap": 0.0039,
+  "weights_15branch": {
+    "semantic": 0.13,
+    "melodic": 0.05,
+    "structural": 0.02,
+    "artifact_diff": 0.01,
+    "ssm": 0.01,
+    "spectral_corr": 0.01,
+    "rhythm": 0.19,
+    "mert": 0.04,
+    "stem_combined": 0.02,
+    "cqt": 0.01,
+    "qmax": 0.12,
+    "clap_multiscale": 0.12,
+    "panns": 0.17,
+    "dmax": 0.04,
+    "tonnetz": 0.06
+  },
+  "weights_13branch": {
+    "semantic": 0.144444,
+    "melodic": 0.055556,
+    "structural": 0.022222,
+    "artifact_diff": 0.011111,
+    "ssm": 0.011111,
+    "spectral_corr": 0.011111,
+    "rhythm": 0.211111,
+    "mert": 0.044444,
+    "stem_combined": 0.022222,
+    "cqt": 0.011111,
+    "qmax": 0.133333,
+    "clap_multiscale": 0.133333,
+    "panns": 0.188889
+  },
+  "per_pair": [
+    {
+      "pair_id": "9_vs_58",
+      "label": 0,
+      "score_13br": 0.7016,
+      "score_15br": 0.7223,
+      "delta": 0.0208
+    },
+    {
+      "pair_id": "11",
+      "label": 1,
+      "score_13br": 0.6765,
+      "score_15br": 0.6968,
+      "delta": 0.0203
+    },
+    {
+      "pair_id": "53_vs_19",
+      "label": 0,
+      "score_13br": 0.6614,
+      "score_15br": 0.6606,
+      "delta": -0.0008
+    },
+    {
+      "pair_id": "70",
+      "label": 1,
+      "score_13br": 0.7739,
+      "score_15br": 0.7696,
+      "delta": -0.0043
+    },
+    {
+      "pair_id": "24_vs_14",
+      "label": 0,
+      "score_13br": 0.7178,
+      "score_15br": 0.7299,
+      "delta": 0.0121
+    },
+    {
+      "pair_id": "3",
+      "label": 1,
+      "score_13br": 0.7519,
+      "score_15br": 0.7466,
+      "delta": -0.0053
+    },
+    {
+      "pair_id": "45_vs_40",
+      "label": 0,
+      "score_13br": 0.6609,
+      "score_15br": 0.6259,
+      "delta": -0.035
+    },
+    {
+      "pair_id": "13",
+      "label": 1,
+      "score_13br": 0.6733,
+      "score_15br": 0.6932,
+      "delta": 0.02
+    },
+    {
+      "pair_id": "35",
+      "label": 1,
+      "score_13br": 0.6557,
+      "score_15br": 0.6303,
+      "delta": -0.0254
+    },
+    {
+      "pair_id": "32_vs_22",
+      "label": 0,
+      "score_13br": 0.7137,
+      "score_15br": 0.7025,
+      "delta": -0.0112
+    }
+  ]
+}

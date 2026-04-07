@@ -1,0 +1,77 @@
+{
+  "single_file_analysis": {
+    "input": "results/mippia_full_results.json",
+    "n_pairs": 124,
+    "n_pos": 62,
+    "n_neg": 62,
+    "baseline": {
+      "accuracy": 0.6854838709677419,
+      "balanced_accuracy": 0.685483870967742,
+      "f1": 0.688,
+      "precision": 0.6825396825396826,
+      "recall": 0.6935483870967742,
+      "tp": 43,
+      "fp": 20,
+      "fn": 19,
+      "tn": 42,
+      "model": "fixed_threshold_0.805"
+    },
+    "baseline_balanced_accuracy_ci95_bootstrap": {
+      "metric": "balanced_accuracy",
+      "mean": 0.6855863830687374,
+      "ci95_low": 0.6041291144200628,
+      "ci95_high": 0.7667811743341404,
+      "ci95_width": 0.1626520599140776
+    },
+    "threshold_sweep": {
+      "best_threshold": 0.807,
+      "best_balanced_accuracy": 0.6935483870967742,
+      "best_accuracy": 0.6935483870967742,
+      "best_f1": 0.6935483870967742
+    },
+    "repeated_holdout_threshold_audit": {
+      "n_runs": 200,
+      "test_size": 0.3,
+      "train_balanced_accuracy_mean": 0.6994186046511629,
+      "train_balanced_accuracy_std": 0.028643005096154455,
+      "test_balanced_accuracy_mean": 0.6476315789473684,
+      "test_balanced_accuracy_std": 0.0679192429771298,
+      "train_test_balanced_accuracy_gap_mean": 0.05178702570379437,
+      "train_f1_mean": 0.7026360837149458,
+      "test_f1_mean": 0.6508667367090953,
+      "train_test_f1_gap_mean": 0.05176934700585058,
+      "tuned_threshold_mean": 0.805995,
+      "tuned_threshold_std": 0.00505993971799554,
+      "tuned_threshold_p10": 0.798,
+      "tuned_threshold_p90": 0.8130000000000001
+    },
+    "nested_threshold_only": {
+      "accuracy": 0.6774193548387096,
+      "balanced_accuracy": 0.6774193548387097,
+      "f1": 0.6666666666666666,
+      "precision": 0.6896551724137931,
+      "recall": 0.6451612903225806,
+      "tp": 40,
+      "fp": 18,
+      "fn": 22,
+      "tn": 44,
+      "model": "nested_cv_threshold_only"
+    },
+    "nested_logistic": {
+      "accuracy": 0.6612903225806451,
+      "balanced_accuracy": 0.6612903225806451,
+      "f1": 0.6557377049180327,
+      "precision": 0.6666666666666666,
+      "recall": 0.6451612903225806,
+      "tp": 40,
+      "fp": 20,
+      "fn": 22,
+      "tn": 42,
+      "model": "nested_cv_logistic"
+    },
+    "warnings": [
+      "Potential instability: test balanced-accuracy variance is high across random splits.",
+      "High uncertainty: baseline metric confidence interval is wide; more data is recommended."
+    ]
+  }
+}

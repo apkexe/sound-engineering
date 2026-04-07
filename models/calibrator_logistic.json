@@ -1,0 +1,34 @@
+{
+  "model_type": "logistic",
+  "feature_names": [
+    "semantic_similarity",
+    "melodic_alignment",
+    "structural_correspondence",
+    "artifact_diff",
+    "ssm_similarity",
+    "spectral_correlation",
+    "rhythm_similarity",
+    "mert_similarity",
+    "stem_combined",
+    "cqt_similarity",
+    "qmax_score",
+    "clap_multiscale",
+    "panns_similarity"
+  ],
+  "coef": [
+    0.3657714147460289,
+    0.13647901005685478,
+    0.06084656231104286,
+    0.03727113955147152,
+    0.022834541317059674,
+    0.007223935111759299,
+    0.48653902881909766,
+    0.08855948492437973,
+    0.03886058233020313,
+    0.02423852458545101,
+    0.3577952328346939,
+    0.32236382146685105,
+    0.1883560236515588
+  ],
+  "intercept": -1.4651240762316422
+}

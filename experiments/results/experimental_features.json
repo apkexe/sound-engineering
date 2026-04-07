@@ -1,0 +1,136 @@
+{
+  "pairs": [
+    {
+      "dmax_score": 0.8567,
+      "cens_similarity": 0.9967,
+      "tonnetz_similarity": 0.9441,
+      "spectral_contrast": 0.9988,
+      "spectral_flux_onset": 0.8627,
+      "track_a": "data\\mippia_full\\9_original.wav",
+      "track_b": "data\\mippia_full\\58_similar.wav",
+      "true_label": 0
+    },
+    {
+      "dmax_score": 0.7079,
+      "cens_similarity": 0.9948,
+      "tonnetz_similarity": 0.9931,
+      "spectral_contrast": 0.9988,
+      "spectral_flux_onset": 0.8138,
+      "track_a": "data\\mippia_full\\11_original.wav",
+      "track_b": "data\\mippia_full\\11_similar.wav",
+      "true_label": 1
+    },
+    {
+      "dmax_score": 0.7125,
+      "cens_similarity": 0.9877,
+      "tonnetz_similarity": 0.6144,
+      "spectral_contrast": 0.9995,
+      "spectral_flux_onset": 0.8388,
+      "track_a": "data\\mippia_full\\53_original.wav",
+      "track_b": "data\\mippia_full\\19_similar.wav",
+      "true_label": 0
+    },
+    {
+      "dmax_score": 0.8677,
+      "cens_similarity": 0.9936,
+      "tonnetz_similarity": 0.6401,
+      "spectral_contrast": 0.9997,
+      "spectral_flux_onset": 0.8193,
+      "track_a": "data\\mippia_full\\70_original.wav",
+      "track_b": "data\\mippia_full\\70_similar.wav",
+      "true_label": 1
+    },
+    {
+      "dmax_score": 0.7799,
+      "cens_similarity": 0.9819,
+      "tonnetz_similarity": 0.8778,
+      "spectral_contrast": 0.9997,
+      "spectral_flux_onset": 0.7837,
+      "track_a": "data\\mippia_full\\24_original.wav",
+      "track_b": "data\\mippia_full\\14_similar.wav",
+      "true_label": 0
+    },
+    {
+      "dmax_score": 0.8947,
+      "cens_similarity": 0.992,
+      "tonnetz_similarity": 0.5679,
+      "spectral_contrast": 0.9997,
+      "spectral_flux_onset": 0.7848,
+      "track_a": "data\\mippia_full\\3_original.wav",
+      "track_b": "data\\mippia_full\\3_similar.wav",
+      "true_label": 1
+    },
+    {
+      "dmax_score": 0.7201,
+      "cens_similarity": 0.9694,
+      "tonnetz_similarity": 0.038,
+      "spectral_contrast": 0.9981,
+      "spectral_flux_onset": 0.8113,
+      "track_a": "data\\mippia_full\\45_original.wav",
+      "track_b": "data\\mippia_full\\40_similar.wav",
+      "true_label": 0
+    },
+    {
+      "dmax_score": 0.7297,
+      "cens_similarity": 0.9634,
+      "tonnetz_similarity": 0.9682,
+      "spectral_contrast": 0.9988,
+      "spectral_flux_onset": 0.7995,
+      "track_a": "data\\mippia_full\\13_original.wav",
+      "track_b": "data\\mippia_full\\13_similar.wav",
+      "true_label": 1
+    },
+    {
+      "dmax_score": 0.7633,
+      "cens_similarity": 0.9842,
+      "tonnetz_similarity": 0.1607,
+      "spectral_contrast": 0.9994,
+      "spectral_flux_onset": 0.8576,
+      "track_a": "data\\mippia_full\\35_original.wav",
+      "track_b": "data\\mippia_full\\35_similar.wav",
+      "true_label": 1
+    },
+    {
+      "dmax_score": 0.6745,
+      "cens_similarity": 0.964,
+      "tonnetz_similarity": 0.553,
+      "spectral_contrast": 0.9995,
+      "spectral_flux_onset": 0.8631,
+      "track_a": "data\\mippia_full\\32_original.wav",
+      "track_b": "data\\mippia_full\\22_similar.wav",
+      "true_label": 0
+    }
+  ],
+  "discrimination": {
+    "dmax_score": {
+      "pos_mean": 0.7927,
+      "neg_mean": 0.7487,
+      "gap": 0.0439,
+      "signal": "STRONG"
+    },
+    "cens_similarity": {
+      "pos_mean": 0.9856,
+      "neg_mean": 0.9799,
+      "gap": 0.0057,
+      "signal": "Weak"
+    },
+    "tonnetz_similarity": {
+      "pos_mean": 0.666,
+      "neg_mean": 0.6055,
+      "gap": 0.0605,
+      "signal": "STRONG"
+    },
+    "spectral_contrast": {
+      "pos_mean": 0.9993,
+      "neg_mean": 0.9991,
+      "gap": 0.0002,
+      "signal": "Weak"
+    },
+    "spectral_flux_onset": {
+      "pos_mean": 0.815,
+      "neg_mean": 0.8319,
+      "gap": -0.0169,
+      "signal": "NONE"
+    }
+  }
+}

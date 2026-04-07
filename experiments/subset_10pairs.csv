@@ -1,0 +1,11 @@
+track_a,track_b,label,pair_id,pair_type
+data\mippia_full\9_original.wav,data\mippia_full\58_similar.wav,0,9_vs_58,negative
+data\mippia_full\11_original.wav,data\mippia_full\11_similar.wav,1,11,positive
+data\mippia_full\53_original.wav,data\mippia_full\19_similar.wav,0,53_vs_19,negative
+data\mippia_full\70_original.wav,data\mippia_full\70_similar.wav,1,70,positive
+data\mippia_full\24_original.wav,data\mippia_full\14_similar.wav,0,24_vs_14,negative
+data\mippia_full\3_original.wav,data\mippia_full\3_similar.wav,1,3,positive
+data\mippia_full\45_original.wav,data\mippia_full\40_similar.wav,0,45_vs_40,negative
+data\mippia_full\13_original.wav,data\mippia_full\13_similar.wav,1,13,positive
+data\mippia_full\35_original.wav,data\mippia_full\35_similar.wav,1,35,positive
+data\mippia_full\32_original.wav,data\mippia_full\22_similar.wav,0,32_vs_22,negative

@@ -1,0 +1,23 @@
+{
+  "feature_names": [
+    "semantic_similarity",
+    "melodic_alignment",
+    "structural_correspondence",
+    "ai_artifact_score",
+    "ssm_similarity",
+    "spectral_correlation",
+    "rhythm_similarity",
+    "artifact_semantic_interaction"
+  ],
+  "coef": [
+    0.04388870881082165,
+    0.781345372281821,
+    0.1326872495671988,
+    0.23246870832571256,
+    0.06705142065660666,
+    0.02192041359143226,
+    1.482021215078334,
+    0.24337040407434662
+  ],
+  "intercept": -1.9059753620398152
+}
