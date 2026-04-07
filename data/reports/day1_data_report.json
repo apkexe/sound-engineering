@@ -1,0 +1,24 @@
+{
+  "audio_dir": "data",
+  "num_files": 6,
+  "num_ok": 6,
+  "num_failed": 0,
+  "duration_sec": {
+    "mean": 16.0,
+    "median": 12.0,
+    "p10": 12.0,
+    "p90": 24.0
+  },
+  "rms": {
+    "mean": 0.14261350284020105,
+    "median": 0.14142249524593353
+  },
+  "mippia_pairs": {
+    "detected": 2,
+    "complete": 2
+  },
+  "outputs": {
+    "file_profile_csv": "data\\reports\\audio_files_profile.csv",
+    "pair_summary_csv": "data\\reports\\mippia_pair_summary.csv"
+  }
+}

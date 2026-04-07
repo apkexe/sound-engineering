@@ -1,0 +1,5 @@
+track_a,track_b,label,pair_type
+data\002_original.wav,data\002_similar.wav,1,positive
+data\001_original.wav,data\002_similar.wav,0,negative
+data\001_original.wav,data\001_similar.wav,1,positive
+data\001_original.wav,data\002_similar.wav,0,negative

@@ -1,0 +1,86 @@
+{
+  "accuracy": 0.4,
+  "precision": 0.3999999992,
+  "recall": 0.999999995,
+  "f1": 0.5714285657142857,
+  "threshold": 0.5,
+  "calibration_model": null,
+  "confusion_matrix": {
+    "tp": 2,
+    "fp": 3,
+    "fn": 0,
+    "tn": 0
+  },
+  "pairs": [
+    {
+      "attribution_score": 0.9132,
+      "semantic_similarity": 0.9899,
+      "melodic_alignment": 0.9013,
+      "best_chroma_key_shift": 5,
+      "structural_correspondence": 1.0,
+      "ai_artifact_score": 0.6487,
+      "verdict": "Strong AI Attribution \u2014 Track B is very likely a synthetic derivative of Track A",
+      "track_a": "data\\001_original.wav",
+      "track_b": "data\\002_similar.wav",
+      "true_label": 0,
+      "predicted": 1,
+      "correct": false
+    },
+    {
+      "attribution_score": 0.9212,
+      "semantic_similarity": 1.0,
+      "melodic_alignment": 0.9202,
+      "best_chroma_key_shift": 0,
+      "structural_correspondence": 1.0,
+      "ai_artifact_score": 0.6344,
+      "verdict": "Strong AI Attribution \u2014 Track B is very likely a synthetic derivative of Track A",
+      "track_a": "data\\001_original.wav",
+      "track_b": "data/001_similar.wav",
+      "true_label": 0,
+      "predicted": 1,
+      "correct": false
+    },
+    {
+      "attribution_score": 0.9212,
+      "semantic_similarity": 1.0,
+      "melodic_alignment": 0.9202,
+      "best_chroma_key_shift": 0,
+      "structural_correspondence": 1.0,
+      "ai_artifact_score": 0.6344,
+      "verdict": "Strong AI Attribution \u2014 Track B is very likely a synthetic derivative of Track A",
+      "track_a": "data\\001_original.wav",
+      "track_b": "data\\001_similar.wav",
+      "true_label": 1,
+      "predicted": 1,
+      "correct": true
+    },
+    {
+      "attribution_score": 0.9162,
+      "semantic_similarity": 0.9994,
+      "melodic_alignment": 0.8972,
+      "best_chroma_key_shift": 0,
+      "structural_correspondence": 1.0,
+      "ai_artifact_score": 0.6487,
+      "verdict": "Strong AI Attribution \u2014 Track B is very likely a synthetic derivative of Track A",
+      "track_a": "data\\002_original.wav",
+      "track_b": "data\\002_similar.wav",
+      "true_label": 1,
+      "predicted": 1,
+      "correct": true
+    },
+    {
+      "attribution_score": 0.9132,
+      "semantic_similarity": 0.9899,
+      "melodic_alignment": 0.9013,
+      "best_chroma_key_shift": 5,
+      "structural_correspondence": 1.0,
+      "ai_artifact_score": 0.6487,
+      "verdict": "Strong AI Attribution \u2014 Track B is very likely a synthetic derivative of Track A",
+      "track_a": "data\\001_original.wav",
+      "track_b": "data\\002_similar.wav",
+      "true_label": 0,
+      "predicted": 1,
+      "correct": false
+    }
+  ]
+}

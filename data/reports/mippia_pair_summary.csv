@@ -1,0 +1,3 @@
+pair_id,original_path,original_duration_sec,similar_path,similar_duration_sec,complete_pair,duration_delta_sec
+001,data\001_original.wav,12.0,data\001_similar.wav,12.0,True,0.0
+002,data\002_original.wav,12.0,data\002_similar.wav,12.0,True,0.0
